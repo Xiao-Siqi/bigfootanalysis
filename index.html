@@ -16,7 +16,7 @@
     <link href="css/styles.css" rel="stylesheet">
 
 
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://d3js.org/d3.v3.min.js"></script>
     <script src="https://d3js.org/topojson.v2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/density-clustering@1.3.0/lib/DBSCAN.min.js"></script>
 
@@ -270,7 +270,34 @@
             <input type="checkbox" id="supernatural-low" checked> Low Supernatural<br>
             <input type="checkbox" id="supernatural-high" checked> High Supernatural<br>
         </div>
-        <script>
+	    <script>
+	        const dataUrl = 'aggregate.json'; // Make sure this URL is correct and accessible
+	
+	        fetch(dataUrl)
+	            .then(response => response.json())
+	            .then(data => {
+	                const sightings = data.bigfootdata;
+	                renderChart(sightings);
+	            })
+	            .catch(error => console.error('Error loading the data:', error));
+	
+	        function renderChart(data) {
+    	            const svg = d3.select('#chart').append('svg')
+	                .attr('width', 960)
+	                .attr('height', 500);
+	
+	            // Assuming 'State' and 'Count_Bigfoot_sightings' are valid data properties
+	            svg.selectAll('circle')
+	                .data(data)
+	                .enter().append('circle')
+	                .attr('cx', (d, i) => (i * 50) % 960)
+	                .attr('cy', d => 500 - (d.Count_Bigfoot_sightings % 500))
+	                .attr('r', 5)
+	                .style('fill', 'blue');
+	        }
+	    </script>
+
+<!--         <script>
             const dataUrl = 'aggregate.json';
 
             fetch(dataUrl)
@@ -500,7 +527,7 @@
                     .style('position, 'absolute')
                     .style('visibility, 'hidden');
             }
-        </script>
+        </script> -->
             </div>
 
 
