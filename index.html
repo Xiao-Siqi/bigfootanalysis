@@ -135,7 +135,7 @@
             height = +svg.attr("height");
 
         var projection = d3.geoAlbersUsa()
-            .translate([width / 2, height / 2])
+            .translate([1000 / 2, 1000 / 2])
             .scale(1260);
 
         var path = d3.geoPath(); //.projection(projection);
@@ -206,7 +206,7 @@
                         var bubble = svg.append("circle")
                             .attr("class", "bubble")
                             .attr("cx", centroid[0])
-                            .attr("cy", centroid[1] - 10)
+                            .attr("cy", centroid[1])
                             .attr("r", Math.sqrt(cluster.length) * 3)
                             .attr("fill-opacity", 0.7)
                             .attr("fill", "blue")
@@ -227,7 +227,7 @@
                         var bubble = svg.append("circle")
                             .attr("class", "bubble")
                             .attr("cx", coord[0])
-                            .attr("cy", coord[1] - 10)
+                            .attr("cy", coord[1])
                             .attr("r", 3)
                             .attr("fill-opacity", 0.7)
                             .attr("fill", "blue")
