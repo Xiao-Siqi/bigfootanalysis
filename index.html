@@ -260,8 +260,18 @@
     <div class="content-container">
         <h3>Scatterplot</h3>
         <div id="chart"></div>
+        <div>
+            <h3>Filtering Option</h3>
+            <input type="checkbox" id="confusion-very-high" checked> Very High Confusion<br>
+            <input type="checkbox" id="confusion-high" checked> High Confusion<br>
+            <input type="checkbox" id="confusion-medium" checked> Medium Confusion<br>
+            <input type="checkbox" id="confusion-low" checked> Low Confusion<br><br>
+
+            <input type="checkbox" id="supernatural-low" checked> Low Supernatural<br>
+            <input type="checkbox" id="supernatural-high" checked> High Supernatural<br>
+        </div>
         <script>
-            const dataUrl = 'aggregate.json'; // Replace with your data path
+            const dataUrl = 'aggregate.json';
 
             fetch(dataUrl)
               .then(response => response.json())
@@ -294,33 +304,104 @@
                     .append('g')
                     .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
-                // Draw scatterplot points
-                svg.selectAll('path')
-                    .data(sightings)
-                    .enter()
-                    .append('path')
-                    .attr('d', d => {
-                        if (d.Supernatural === 'Low') return d3.symbol().type(d3.symbolCircle)();
-                        else if (d.Supernatural === 'High') return d3.symbol().type(d3.symbolTriangle)();
-                    })
-                    .attr('transform', d => `translate(${xScale(d.State) + xScale.bandwidth() / 2}, ${yScale(+d.Count_Bigfoot_sightings)})`)
-                    .attr('fill', d => {
-                        if (d.Confusion === 'Very High') return 'red';
-                        else if (d.Confusion === 'High') return 'orange';
-                        else if (d.Confusion === 'Medium') return 'yellow';
-                        else if (d.Confusion === 'Low') return 'green';
-                        else return 'blue'; // Default color
-                    })
-                    .attr('stroke', 'white')
-                    .attr('stroke-width', 1)
-                    .on('mouseover', (event, d) => {
-                        tooltip.style('visibility', 'visible')
-                            .html(`State: ${d.State}<br>Count: ${d.Count_Bigfoot_sightings}`)
-                            .style('left', (event.pageX + 10) + 'px')
-                            .style('top', (event.pageY - 15) + 'px');
-                    })
-                    .on('mouseout', () => {
-                        tooltip.style('visibility', 'hidden');
+                // Selected confusion levels (initially all checked)
+                let selectedConfusionLevels = ['Very High', 'High', 'Medium', 'Low'];
+
+                // Selected supernatural levels (initially all checked)
+                let selectedSupernaturalLevels = ['Low', 'High'];
+
+                // Update function to be called on checkbox changes
+                const updateData = () => {
+                    const filteredSightings = sightings.filter(d =>
+                        selectedConfusionLevels.includes(d.Confusion) &&
+                        selectedSupernaturalLevels.includes(d.Supernatural)
+                    );
+
+                    // Update data points based on filters
+                    svg.selectAll('path')
+                        .data(filteredSightings)
+                        .join(
+                            enter => enter.append('path')
+                                .attr('d', d => {
+                                    if (d.Supernatural === 'Low') return d3.symbol().type(d3.symbolCircle)();
+                                    else if (d.Supernatural === 'High') return d3.symbol().type(d3.symbolTriangle)();
+                                })
+                                .attr('transform', d => `translate(${xScale(d.State) + xScale.bandwidth() / 2}, ${yScale(+d.Count_Bigfoot_sightings)})`)
+                                .attr('fill', d => {
+                                    if (d.Confusion === 'Very High') return 'red';
+                                    else if (d.Confusion === 'High') return 'orange';
+                                    else if (d.Confusion === 'Medium') return 'yellow';
+                                    else if (d.Confusion === 'Low') return 'green';
+                                    else return 'blue'; // Default color
+                                })
+                                .attr('stroke', 'white')
+                                .attr('stroke-width', 1)
+                                .on('mouseover', (event, d) => {
+                                    tooltip.style('visibility', 'visible')
+                                        .html(`State: ${d.State}<br>Count: ${d.Count_Bigfoot_sightings}`)
+                                        .style('left', (event.pageX + 10) + 'px')
+                                        .style('top', (event.pageY - 15) + 'px');
+                                })
+                                .on('mouseout', () => {
+                                    tooltip.style('visibility', 'hidden');
+                                }),
+                            update => update
+                                .attr('transform', d => `translate(${xScale(d.State) + xScale.bandwidth() / 2}, ${yScale(+d.Count_Bigfoot_sightings)})`)
+                                .attr('fill', d => {
+                                    if (d.Confusion === 'Very High') return 'red';
+                                    else if (d.Confusion === 'High') return 'orange';
+                                    else if (d.Confusion === 'Medium') return 'yellow';
+                                    else if (d.Confusion === 'Low') return 'green';
+                                    else return 'blue'; // Default color
+                                }),
+                            exit => exit.remove()
+                        );
+                };
+
+                // Update on initial load
+                updateData();
+
+                // Event listeners for checkbox changes
+                d3.select('#confusion-very-high')
+                    .on('change', function() {
+                        const isChecked = this.checked;
+                        selectedConfusionLevels = isChecked ? [...selectedConfusionLevels, 'Very High'] : selectedConfusionLevels.filter(l => l !== 'Very High');
+                        updateData();
+                    });
+
+                d3.select('#confusion-high')
+                    .on('change', function() {
+                        const isChecked = this.checked;
+                        selectedConfusionLevels = isChecked ? [...selectedConfusionLevels, 'High'] : selectedConfusionLevels.filter(l => l !== 'High');
+                        updateData();
+                    });
+
+                d3.select('#confusion-medium')
+                    .on('change', function() {
+                        const isChecked = this.checked;
+                        selectedConfusionLevels = isChecked ? [...selectedConfusionLevels, 'Medium'] : selectedConfusionLevels.filter(l => l !== 'Medium');
+                        updateData();
+                    });
+
+                d3.select('#confusion-low')
+                    .on('change', function() {
+                        const isChecked = this.checked;
+                        selectedConfusionLevels = isChecked ? [...selectedConfusionLevels, 'Low'] : selectedConfusionLevels.filter(l => l !== 'Low');
+                        updateData();
+                    });
+
+                d3.select('#supernatural-low')
+                    .on('change', function() {
+                        const isChecked = this.checked;
+                        selectedSupernaturalLevels = isChecked ? [...selectedSupernaturalLevels, 'Low'] : selectedSupernaturalLevels.filter(l => l !== 'Low');
+                        updateData();
+                    });
+
+                d3.select('#supernatural-high')
+                    .on('change', function() {
+                        const isChecked = this.checked;
+                        selectedSupernaturalLevels = isChecked ? [...selectedSupernaturalLevels, 'High'] : selectedSupernaturalLevels.filter(l => l !== 'High');
+                        updateData();
                     });
 
                 // Add X axis
@@ -364,7 +445,7 @@
                     .attr('x', 0)
                     .attr('y', 0)
                     .attr('width', 10)
-                    .attr('height', 10)
+                    .attr('height, 10)
                     .attr('fill', (d, i) => legendColors[i]);
 
                 legend.selectAll('.legend-item')
@@ -390,8 +471,8 @@
                     .attr('d', d3.symbol().type(d3.symbolCircle)())
                     .attr('fill', 'none')
                     .attr('stroke', 'black')
-                    .attr('stroke-width', 1)
-                    .attr('transform', 'translate(0, 0)');
+                    .attr('stroke-width, 1)
+                    .attr('transform, 'translate(0, 0)');
 
                 shapeLegend.append('text')
                     .attr('x', 15)
@@ -402,9 +483,9 @@
                 shapeLegend.append('path')
                     .attr('d', d3.symbol().type(d3.symbolTriangle)())
                     .attr('fill', 'none')
-                    .attr('stroke', 'black')
-                    .attr('stroke-width', 1)
-                    .attr('transform', 'translate(0, 20)');
+                    .attr('stroke, 'black')
+                    .attr('stroke-width, 1)
+                    .attr('transform, 'translate(0, 20)');
 
                 shapeLegend.append('text')
                     .attr('x', 15)
@@ -415,9 +496,9 @@
                 // Tooltip
                 const tooltip = d3.select('#chart')
                     .append('div')
-                    .attr('class', 'tooltip')
-                    .style('position', 'absolute')
-                    .style('visibility', 'hidden');
+                    .attr('class, 'tooltip')
+                    .style('position, 'absolute')
+                    .style('visibility, 'hidden');
             }
         </script>
             </div>
