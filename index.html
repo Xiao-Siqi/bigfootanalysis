@@ -1,614 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>USC Data Science - UFO Database</title>
-    <!-- Bootstrap Core CSS -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Scrolling Nav CSS -->
-    <link href="css/scrolling-nav.css" rel="stylesheet">
-
-    <!-- Custom CSS -->
-    <link href="css/styles.css" rel="stylesheet">
-
-
-    <script src="https://d3js.org/d3.v4.min.js"></script>
-    <script src="https://d3js.org/topojson.v2.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/density-clustering@1.3.0/lib/DBSCAN.min.js"></script>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Data Visualization Tabs</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        body {
+            padding-top: 20px;
+        }
+        .vertical-tabs {
+            width: 200px; /* Adjust width of the tabs */
+        }
+        .tab-content {
+            margin-left: 220px; /* Adjust content area position */
+            width: 80%;
+        }
         .content-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center; /* Use this if you also want vertical centering */
-    width: 100%; /* Adjust width as necessary */
-    margin-top: 7%; /* Your existing margin */
-}
-        .states {
-            fill: #f6a071;
-        }
-        .state-borders {
-            fill: none;
-            stroke: #fff;
-            stroke-width: 0.5px;
-            stroke-linejoin: round;
-            stroke-linecap: round;
-            pointer-events: none;
-        }
-        .bubble {
-            fill: #c91515;
-            fill-opacity: 0.7;
-            stroke: #fff;
-            stroke-width: 1.5px;
-        }
-
-        #controls {
-            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
     </style>
-
 </head>
-
-<!-- The #page-top ID is part of the scrolling feature - the data-spy and data-target are part of the built-in Bootstrap scrollspy function -->
-
-<body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top">
-
-    <!-- Navigation -->
-    <div id="nav-main">
-    <nav class="navbar mav-main navbar-default navbar-fixed-top" role="navigation">
-        <div class="container">
-            <div class="navbar-header page-scroll">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-
-            </div>
-
-            <div class="collapse navbar-collapse navbar-ex1-collapse">
-              <nav id="nav-wrap">
-                <ul class="nav navbar-nav navbar-custom">
-                    <li class="current"><a class="page-scroll" href="#page-top" style="color:white">Home</a></li>
-                    <li class="hidden"><a class="page-scroll" href="#page-top" style="color:white"></a></li>
-                    <li><a class="page-scroll" href="#about" style="color:#ffffff">About</a></li>
-                    <li><a class="page-scroll" href="#features" style="color:#ffffff">Insights</a></li>
-                    <li><a class="page-scroll" style="color:#ffffff" href="#learn-more">Search</a></li>
-                    <li><a class="page-scroll" style="color:#ffffff" href="#learn-more">Partners</a></li>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3 vertical-tabs">
+                <ul class="nav nav-pills flex-column" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="tab" href="#wordCloud">Word Cloud</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#barChart">Bar Chart Race</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#lineChart">Line Chart Witness Count</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#bubbleMap">Bubble Map</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#scatterplot">Scatterplot</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#extra">Extra Content</a>
+                    </li>
                 </ul>
-              </nav>
-
-                <a href="http://usc.edu" class="pull-right">
-                  <img src="images/usc-primary-logotype.svg" width="176px" height="38px">
-                </a>
             </div>
-        </div>
-    </nav>
-  </div>
-
-    <!-- Intro Section -->
-    <!-- Visualization Starts Here -->
-    <div class="content-container">
-        <h3>Word Cloud</h3>
-        <iframe width="50%" height="682" frameborder="0"
-  src="https://observablehq.com/embed/@siqix/dsci550_hw3@495?cells=wordCloudSVG3&api_key=a52bda0a48ae999804e4de822a74c0f4fcbd2668"></iframe>
-    </div>
-
-    <div class="content-container">
-        <h3>Bar Chart Race</h3>
-        <iframe width="50%" height="682" frameborder="0"
-    src="https://observablehq.com/embed/@siqix/dsci550_hw3@495?cells=chart&api_key=5a7693f630968b6f696d91b02678aea8288b2ee8"></iframe>
-    </div>
-
-    <div class="content-container">
-        <h3>Line Chart Witness Count</h3>
-        <iframe width="50%" height="600" frameborder="0"
-    src="https://observablehq.com/embed/@siqix/dsci550_hw3@495?cells=chart1&api_key=5a7693f630968b6f696d91b02678aea8288b2ee8"></iframe>
-    </div>
-
-    <div class="content-container">
-        <h3>Bubble Map</h3>
-        <svg width="960" height="682"></svg>
-    <div id="controls">
-        <label for="epsilon">Epsilon (max distance between points):</label>
-        <input type="number" id="epsilon" value="5">
-        <br>
-        <label for="minPts">MinPts (min number of points to form a cluster):</label>
-        <input type="number" id="minPts" value="5">
-        <br>
-        <label for="clustering">Enable Clustering:</label>
-        <input type="checkbox" id="clustering" checked>
-    </div>
-    <svg id="cluster-size" width="960" height="30">
-        <text x="10" y="20">Cluster Size: </text>
-    </svg>
-    <script>
-
-        var svg = d3.select("svg"),
-            width = +svg.attr("width"),
-            height = +svg.attr("height");
-
-        var projection = d3.geoAlbersUsa()
-            .translate([960 / 2, 600 / 2])
-            .scale(1260);
-
-        var path = d3.geoPath(); //.projection(projection);
-
-        // Draw the map
-        d3.json("https://d3js.org/us-10m.v1.json", function(error, us) {
-            if (error) throw error;
-
-            // Append a group for the map and draw it
-            var mapGroup = svg.append('g').attr('id', 'mapGroup');
-
-            mapGroup.selectAll("path")
-                .data(topojson.feature(us, us.objects.states).features)
-                .enter().append("path")
-                .attr("class", "state")
-                .attr("d", path);
-
-            mapGroup.append("path")
-                .attr("class", "state-borders")
-                .attr("d", path(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; })));
-
-            // Now that the map is drawn, add the bubbles on top
-            addBubbles();
-        });
-
-        function addBubbles() {
-            d3.json("aggregate.json", function(error, data) {
-                if (error) throw error;
-
-                var entries = data.bigfootdata;
-                //console.log("Data loaded:", entries); // Verify data is loaded correctly
-
-                var epsilon = +document.getElementById("epsilon").value;
-                var minPts = +document.getElementById("minPts").value;
-                var clusteringEnabled = document.getElementById("clustering").checked;
-
-                // Prepare the data for clustering
-                var coords = entries.map(function(entry) {
-                    var projected = projection([+entry.Longitude, +entry.Latitude]);
-                    return projected ? [projected[0], projected[1]] : null;
-                }).filter(function(d) { // Filter out any null values
-                    return d !== null;
-                });
-
-                if (clusteringEnabled) {
-                    // Perform DBSCAN clustering
-                    var dbscan = new DBSCAN();
-                    var clusters = dbscan.run(coords, epsilon, minPts);
-
-                    // Remove existing bubbles
-                    svg.selectAll('.bubble').remove();
-
-                    // Draw the clusters on the map
-                    clusters.forEach(function(cluster) {
-                        if (cluster.length === 0) return; // Skip empty clusters
-
-                        // Calculate the centroid of the cluster
-                        var centroid = cluster.reduce(function(accumulator, index) {
-                            accumulator[0] += coords[index][0]; // X coordinate
-                            accumulator[1] += coords[index][1]; // Y coordinate
-                            return accumulator;
-                        }, [0, 0]);
-
-                        centroid[0] /= cluster.length; // Average X coordinate
-                        centroid[1] /= cluster.length; // Average Y coordinate
-
-                        // Draw the bubble at the centroid location
-                        var bubble = svg.append("circle")
-                            .attr("class", "bubble")
-                            .attr("cx", centroid[0])
-                            .attr("cy", centroid[1])
-                            .attr("r", Math.sqrt(cluster.length) * 3)
-                            .attr("fill-opacity", 0.7)
-                            .attr("fill", "blue")
-                            .attr("stroke", "white")
-                            .attr("stroke-width", 1.5);
-
-                        // Add event listener to each bubble for mouseover
-                        bubble.on('mouseover', function() {
-                            updateClusterSizeText(cluster.length);
-                        });
-                    });
-                } else {
-                    // Show single points without clustering
-                    svg.selectAll('.bubble').remove();
-
-                    // Draw each point as a single circle
-                    coords.forEach(function(coord) {
-                        var bubble = svg.append("circle")
-                            .attr("class", "bubble")
-                            .attr("cx", coord[0])
-                            .attr("cy", coord[1])
-                            .attr("r", 3)
-                            .attr("fill-opacity", 0.7)
-                            .attr("fill", "blue")
-                            .attr("stroke", "white")
-                            .attr("stroke-width", 1.5);
-
-                        // Add event listener to each bubble for mouseover
-                        bubble.on('mouseover', function() {
-                            updateClusterSizeText(1); // For single points, set size to 1
-                        });
-                    });
-                }
-            });
-        }
-
-        // Add event listeners to update bubbles on input change
-        document.getElementById("epsilon").addEventListener("change", addBubbles);
-        document.getElementById("minPts").addEventListener("change", addBubbles);
-        document.getElementById("clustering").addEventListener("change", addBubbles);
-
-        // Function to update cluster size text
-        function updateClusterSizeText(size) {
-            d3.select("#cluster-size text").text("Cluster Size: " + size);
-        }
-
-    </script>
-    </div>
-
-
-    <div class="content-container">
-        <h3>Scatterplot</h3>
-        <div id="chart"></div>
-        <script>
-            const dataUrl = 'aggregate.json'; // Replace with your data path
-
-            fetch(dataUrl)
-              .then(response => response.json())
-              .then(data => {
-                const sightings = data.bigfootdata;
-                processData(sightings); // Call function to process data
-              })
-              .catch(error => console.error(error));
-
-            function processData(sightings) {
-                const margin = { top: 20, right: 20, bottom: 62, left: 50 };
-                const width = 960 - margin.left - margin.right;
-                const height = 420 - margin.top - margin.bottom;
-
-                // Define scales
-                const xScale = d3.scaleBand()
-                    .domain(sightings.map(d => d.State))
-                    .range([0, width])
-                    .padding(0.1);
-
-                const yScale = d3.scaleLinear()
-                    .domain([0, d3.max(sightings, d => +d.Count_Bigfoot_sightings)])
-                    .range([height, 0]);
-
-                // Create SVG
-                const svg = d3.select('#chart')
-                    .append('svg')
-                    .attr('width', width + margin.left + margin.right)
-                    .attr('height', height + margin.top + margin.bottom)
-                    .append('g')
-                    .attr('transform', `translate(${margin.left}, ${margin.top})`);
-
-                // Draw scatterplot points
-                svg.selectAll('path')
-                    .data(sightings)
-                    .enter()
-                    .append('path')
-                    .attr('d', d => {
-                        if (d.Supernatural === 'Low') return d3.symbol().type(d3.symbolCircle)();
-                        else if (d.Supernatural === 'High') return d3.symbol().type(d3.symbolTriangle)();
-                    })
-                    .attr('transform', d => `translate(${xScale(d.State) + xScale.bandwidth() / 2}, ${yScale(+d.Count_Bigfoot_sightings)})`)
-                    .attr('fill', d => {
-                        if (d.Confusion === 'Very High') return 'red';
-                        else if (d.Confusion === 'High') return 'orange';
-                        else if (d.Confusion === 'Medium') return 'yellow';
-                        else if (d.Confusion === 'Low') return 'green';
-                        else return 'blue'; // Default color
-                    })
-                    .attr('stroke', 'white')
-                    .attr('stroke-width', 1)
-                    .on('mouseover', (event, d) => {
-                        tooltip.style('visibility', 'visible')
-                            .html(`State: ${d.State}<br>Count: ${d.Count_Bigfoot_sightings}`)
-                            .style('left', (event.pageX + 10) + 'px')
-                            .style('top', (event.pageY - 15) + 'px');
-                    })
-                    .on('mouseout', () => {
-                        tooltip.style('visibility', 'hidden');
-                    });
-
-                // Add X axis
-                svg.append('g')
-                    .attr('transform', `translate(0, ${height})`)
-                    .call(d3.axisBottom(xScale))
-                    .selectAll('text')
-                    .style('text-anchor', 'end')
-                    .attr('dx', '-.8em')
-                    .attr('dy', '.15em')
-                    .attr('transform', 'rotate(-45)');
-
-                // Add Y axis
-                svg.append('g')
-                    .call(d3.axisLeft(yScale));
-
-                // Add legend for Confusion attribute
-                const legend = svg.append('g')
-                    .attr('class', 'legend')
-                    .attr('transform', `translate(${width - 165}, 20)`);
-
-                const legendData = ['Very High', 'High', 'Medium', 'Low'];
-                const legendColors = ['red', 'orange', 'yellow', 'green'];
-
-                // title
-                legend.append('text')
-                    .attr('x', 0)
-                    .attr('y', -20)
-                    .attr('font-weight', 'bold')
-                    .text('Animal Confusion');
-
-                legend.selectAll('.legend-item')
-                    .data(legendData)
-                    .enter()
-                    .append('g')
-                    .attr('class', 'legend-item')
-                    .attr('transform', (d, i) => `translate(0, ${i * 20})`);
-
-                legend.selectAll('.legend-item')
-                    .append('rect')
-                    .attr('x', 0)
-                    .attr('y', 0)
-                    .attr('width', 10)
-                    .attr('height', 10)
-                    .attr('fill', (d, i) => legendColors[i]);
-
-                legend.selectAll('.legend-item')
-                    .append('text')
-                    .attr('x', 15)
-                    .attr('y', 9)
-                    .attr('dy', '.35em')
-                    .text(d => d);
-
-                // Add legend for Supernatural attribute
-                const shapeLegend = svg.append('g')
-                    .attr('class', 'legend')
-                    .attr('transform', `translate(${width - 165}, 150)`);
-
-                // title
-                shapeLegend.append('text')
-                    .attr('x', 0)
-                    .attr('y', -20)
-                    .attr('font-weight', 'bold')
-                    .text('Supernatural Belief (UFO)');
-
-                shapeLegend.append('path')
-                    .attr('d', d3.symbol().type(d3.symbolCircle)())
-                    .attr('fill', 'none')
-                    .attr('stroke', 'black')
-                    .attr('stroke-width', 1)
-                    .attr('transform', 'translate(0, 0)');
-
-                shapeLegend.append('text')
-                    .attr('x', 15)
-                    .attr('y', 5)
-                    .attr('dy', '.35em')
-                    .text('Low');
-
-                shapeLegend.append('path')
-                    .attr('d', d3.symbol().type(d3.symbolTriangle)())
-                    .attr('fill', 'none')
-                    .attr('stroke', 'black')
-                    .attr('stroke-width', 1)
-                    .attr('transform', 'translate(0, 20)');
-
-                shapeLegend.append('text')
-                    .attr('x', 15)
-                    .attr('y', 25)
-                    .attr('dy', '.35em')
-                    .text('High');
-
-                // Tooltip
-                const tooltip = d3.select('#chart')
-                    .append('div')
-                    .attr('class', 'tooltip')
-                    .style('position', 'absolute')
-                    .style('visibility', 'hidden');
-            }
-        </script>
-            </div>
-
-
-    <!-- <div>
-        <section id="intro" class="intro-section" style="background-image: url('images/ufoedited.png'); opacity: 1.0;background-attachment: fixed; background-size: cover;
-          background-repeat: no-repeat;">
-            <div class="container" style="padding-top:100px">
-                <div class="row">
-                    <div class="col-lg-12" >
-                        <h1 class="title">UFO Data Insights</h1>
-                        <br><a style="text-decoration: none;" href="http://irds.usc.edu/"><h3 id="irdsgroup">USC Data Science</h3></a>
+            <div class="col-md-9 tab-content">
+                <div class="tab-pane active" id="wordCloud">
+                    <div class="content-container">
+                        <h3>Word Cloud</h3>
+                        <!-- Your Word Cloud content here -->
                     </div>
                 </div>
-                <div class="row" style="padding-top:15px">
-                  <div class="col-md-12">
-                    <a class="btn btn-default btn-lg page-scroll" href="#about" style="margin-top:5%">Learn More</a>
-                  </div>
-                </div>
-                <div class="row" style="padding-top:180px">
-                    <div class="col-md-3 col-md-offset-1">
-                      <a class="btn btn-default btn-lg page-scroll"
-                      href="html/d3-examples.html">Explore Visualizations</a>
-                    </div>
-
-                    <div class="col-sm-4"></div>
-                    <div class="col-md-3">
-                      <a class="btn btn-default btn-lg page-scroll pull-left"
-                      href="#" style="width:200px;">Deep Insights</a>
+                <div class="tab-pane fade" id="barChart">
+                    <div class="content-container">
+                        <h3>Bar Chart Race</h3>
+                        <!-- Your Bar Chart Race content here -->
                     </div>
                 </div>
-
-            </div>
-
-        </section>
-    </div> -->
-
-    <!-- About Section -->
-    <!-- <div>
-        <section id="about" class="about-section" style="margin-top:-1%; margin-bottom:5%">
-            <div class="container">
-                <div class="row">
-
-                    <hr class="about-divider">
-                    <h1>About Us</h1>
-                    <hr class="about-divider">
-
-                    <div class="jumbotron" style="margin-bottom:5%; margin-top:3%">
-                        <h2>What is UFO Data Insights?</h2>
-                        <p class="lead text-left" style="margin-top:2%">JPL and USC, under the direction of Dr. Chris Mattmann, have worked to collect a corpus of “deep web” UFO datasets spanning many file types containing scientific data such as images, videos, and other information on the Web. These pieces of data were collected using Apache Nutch, Apache Tika, and Apache Solr.</p>
-                        <p class="lead text-left">Our goal is to aggregate this data into an intuitive search engine that scientists can utilize for UFO research. Additionally, the data is analyzed and illustrated using D3.js, providing researchers a better understanding of the data's relationship of UFO sightings.</p>
+                <div class="tab-pane fade" id="lineChart">
+                    <div class="content-container">
+                        <h3>Line Chart Witness Count</h3>
+                        <!-- Your Line Chart content here -->
                     </div>
-
-                    <div class="col-md-4">
-                       <div class="media">
-                          <div class="media-left">
-                              <img class="media-object" src="images/searchimg.jpg" alt="...">
-                          </div>
-                          <div class="media-body">
-                              <h4 class="media-heading">Search Engine</h4>
-                              Providing researchers with a powerful tool to find relevant data sets and websites.
-                          </div>
-                        </div>
+                </div>
+                <div class="tab-pane fade" id="bubbleMap">
+                    <div class="content-container">
+                        <h3>Bubble Map</h3>
+                        <!-- Your Bubble Map content here -->
                     </div>
-
-                    <div class="col-md-4">
-                       <div class="media">
-                          <div class="media-left">
-                              <img class="media-object" src="images/visualimg.jpg" alt="...">
-                          </div>
-                          <div class="media-body">
-                              <h4 class="media-heading">Visualizer</h4>
-                              Illustrating data set connections and related terms to narrow searches.
-                          </div>
-                        </div>
+                </div>
+                <div class="tab-pane fade" id="scatterplot">
+                    <div class="content-container">
+                        <h3>Scatterplot</h3>
+                        <!-- Your Scatterplot content here -->
                     </div>
-
-                    <div class="col-md-4">
-                       <div class="media">
-                          <div class="media-left">
-                              <img class="media-object" src="images/publicizer.png" alt="...">
-                          </div>
-                          <div class="media-body">
-                              <h4 class="media-heading">Publicizer</h4>
-                              Demonstrate the value of these UFO data sets to the NSF, USC, and NASA.
-                          </div>
-                        </div>
+                </div>
+                <div class="tab-pane fade" id="extra">
+                    <div class="content-container">
+                        <h3>Extra Content</h3>
+                        <!-- Any extra content -->
                     </div>
                 </div>
             </div>
-        </section>
-    </div> -->
-
-    <!-- Features Section -->
-    <!-- <div>
-        <section id="features" class="features-section" style="margin-top:-1%; margin-bottom:5%">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <hr class="featurette-divider">
-                        <h1>Insights</h1>
-                        <hr class="featurette-divider">
-                    </div>
-
-
-                    <!--D3.js Feature-->
-         <!-- <hr class="featurette-divider">
-                    <div class="row featurette" style="margin-top:3%; margin-bottom:3%">
-                        <div class="col-md-7 col-md-push-5">
-                          <h2 align=left class="featurette-heading"><a href="https://d3js.org/">D3.js</a>. <span class="text-muted">See for yourself.</span></h2>
-                          <p align=left class="lead">View data sets from a variety of sources to better understand UFO relationships. </p>
-                          <p align=left class="lead"> <a href="html/d3-examples.html"> View some of our visualizations. </a> </p>
-                        </div>
-                        <div class="col-md-5 col-md-pull-7">
-                          <img class="featurette-image img-responsive center-block" src="images/d3_feature.png" alt="Generic placeholder image">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </div> --> -->
-
-
-    <!-- Learn More Section -->
-	<!-- <div>
-		<section id="learn-more" class="learn-more-section">
-			<div class="container">
-				 <div class="col-lg-12" style="margin-top:8%">
-					  <hr class="featurette-divider" style="margin-top:-1%">
-					  <h1 align=center>USC Data Science Partner Sites</h1>
-					  <hr class="featurette-divider">
-				 </div>
-				 <div class="row">
-				  <div class="col-md-12 col-sm-4 col-xs-4" style="margin-top:3%">
-					  <div class="panel panel-info">
-							  <div class="panel-heading">
-							   <h4><center>IRDS</h4>
-							  </div>
-							  <div class="panel-body">
-								  <p style="font-size: 15pt;">
-  									The Information Retrieval and Data Science Group’s (I.R.D.S.) mission is to research and develop new methodology and open source software to analyze, ingest, process, and manage Big Data and to turn it into
-                     information.
-								  </p>
-								  <p style="font-size: 15pt;">
-									   We have expertise in data collection and contribute to the world's largest and most often downloaded open-source projects, working with NASA, DARPA, DHS, NIH across a number of domains, Earth Science,Planetary Science, Astronomy, defense, and private industry.
-								  </p>
-							  </div>
-
-							  <div class="panel-footer">
-								  <center><a href="http://irds.usc.edu/" class="btn btn-info ">Visit IRDS</a>
-							  </div>
-                        </div>
-
-
-
-          </div>
-				</div>
-				<div class="col-lg-12" style="margin-top:5%;" >
-                  <h3 align=center>Credits</h3>
-                  <hr class="featurette-divider">
-                  <div class="row">
-                  <p>Dr. Chris Mattmann - <a href="http://sunset.usc.edu/~mattmann/">Visit his website</a></p>
-                  <p>CS401 Group (Lorraine Sposto, Jonathan Luu, Ruthvik Peddawandla, Titus Jung, Janet Kim)</p>
-                  <p>CS599 Spring 2018 Class - <a href="http://irds.usc.edu/classes/cs599_2018a/">Visit the class website</a></p>
-                  <p>CS572 Spring 2015 Class - <a href="http://sunset.usc.edu/classes/cs572_2015/">Visit the class website</a></p>
-				</div>
-            </div>
-			</div>
-		</section>
-	</div> -->
-
-    <hr class="featurette-divider">
-    <div>
-        <div class="container">
-            <footer>
-                <p align=center>©USC Data Science Group 2024, All Rights Reserved</p>
-            </footer>
         </div>
     </div>
 
-    <!-- jQuery -->
-    <script src="js/jquery.js"></script>
-
-    <!-- Bootstrap Core JavaScript -->
-    <script src="js/bootstrap.min.js"></script>
-
-    <!-- Scrolling Nav JavaScript -->
-    <script src="js/jquery.easing.min.js"></script>
-    <script src="js/scrolling-nav.js"></script>
-    <script src="js/cardpanel.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
-
 </html>
