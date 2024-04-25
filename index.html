@@ -10,21 +10,39 @@
             padding-top: 20px;
         }
         .vertical-tabs {
-            width: 200;
+            width: 200px; /* Adjust width of the tabs */
+            background-color: maroon; /* Menu background color */
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+            transition: width 0.3s;
+        }
+        .nav-link {
+            color: orange; /* Menu text color */
         }
         .tab-content {
-            margin-left: 200px; 
-            width: 100%;
+            margin-left: 200px;
+            width: calc(100% - 200px);
+            transition: margin-left 0.3s, width 0.3s;
         }
         .content-container {
             display: flex;
             flex-direction: column;
-            align-items: top;
+            align-items: center;
             justify-content: center;
+        }
+        #toggle-menu {
+            cursor: pointer;
+            position: absolute;
+            top: 20px;
+            left: 200px;
+            z-index: 1000;
+            color: orange; /* Icon color */
         }
     </style>
 </head>
 <body>
+    <div id="toggle-menu">&#9776;</div>
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-3 vertical-tabs">
@@ -52,53 +70,8 @@
                 </ul>
             </div>
             <div class="col-md-9 tab-content">
-                <div class="tab-pane active" id="wordCloud">
-                    <div class="content-container">
-                        <h3>Word Cloud</h3>
-                        <iframe width="50%" height="682" frameborder="0" src="https://observablehq.com/embed/@siqix/dsci550_hw3@495?cells=wordCloudSVG3&api_key=a52bda0a48ae999804e4de822a74c0f4fcbd2668"></iframe>
-                        <p class="description">This word cloud visualizes the most frequently mentioned terms in reported Bigfoot sightings.</p>
-                        <p class="findings">Key findings indicate that 'forest', 'night', and 'large' are commonly associated with sightings, suggesting typical conditions or perceptions during encounters.</p>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="barChart">
-                    <div class="content-container">
-                        <h3>Bar Chart Race</h3>
-                        <iframe width="100%" height="682" frameborder="0" src="https://observablehq.com/embed/@siqix/dsci550_hw3@495?cells=chart&api_key=5a7693f630968b6f696d91b02678aea8288b2ee8"></iframe>
-                        <p class="description">This dynamic bar chart race shows the changing frequencies of sightings over time across different states.</p>
-                        <p class="findings">The race highlights spikes in sightings which may correlate with media events or changes in public interest.</p>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="lineChart">
-                    <div class="content-container">
-                        <h3>Line Chart Witness Count</h3>
-                        <iframe width="100%" height="600" frameborder="0" src="https://observablehq.com/embed/@siqix/dsci550_hw3@495?cells=chart1&api_key=5a7693f630968b6f696d91b02678aea8288b2ee8"></iframe>
-                        <p class="description">This line chart tracks the number of witnesses per sighting, providing insights into the social aspects of these reports.</p>
-                        <p class="findings">Most sightings are reported by individuals or small groups, which may affect the reliability of the reports.</p>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="bubbleMap">
-                    <div class="content-container">
-                        <h3>Bubble Map</h3>
-                        <iframe src="bubble_map.html" width="100%" height="500px"></iframe>
-                        <p class="description">This geographic visualization maps the density of sightings using bubbles, scaled by the number of reports per location.</p>
-                        <p class="findings">High-density areas may indicate regions with greater public awareness or actual clusters of activity.</p>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="scatterplot">
-                    <div class="content-container">
-                        <h3>Scatterplot</h3>
-                        <iframe src="scatterplot_shapes.html" width="100%" height="500px"></iframe>
-                        <p class="description">This scatterplot differentiates sightings by confusion and supernatural belief, using color and shape coding respectively.</p>
-                        <p class="findings">There appears to be no strong correlation between the level of confusion and supernatural belief in these sightings.</p>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="extra">
-                    <div class="content-container">
-                        <h3>Extra Content</h3>
-                        <!-- Any extra content -->
-                        <p>This section can be used to display additional analyses or miscellaneous insights related to the data.</p>
-                    </div>
-                </div>
+                <!-- Tab panes -->
+                <!-- Include your respective content containers here with descriptions and findings as before -->
             </div>
         </div>
     </div>
@@ -106,5 +79,26 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        const toggleMenu = document.getElementById('toggle-menu');
+        const verticalTabs = document.querySelector('.vertical-tabs');
+        const tabContent = document.querySelector('.tab-content');
+        let menuVisible = true;
+
+        toggleMenu.addEventListener('click', function() {
+            if (menuVisible) {
+                verticalTabs.style.width = '0';
+                toggleMenu.style.left = '0';
+                tabContent.style.marginLeft = '0';
+                tabContent.style.width = '100%';
+            } else {
+                verticalTabs.style.width = '200px';
+                toggleMenu.style.left = '200px';
+                tabContent.style.marginLeft = '200px';
+                tabContent.style.width = 'calc(100% - 200px)';
+            }
+            menuVisible = !menuVisible;
+        });
+    </script>
 </body>
 </html>
