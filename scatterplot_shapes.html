@@ -1,0 +1,280 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Bigfoot Sightings Scatterplot</title>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <style>
+            .container {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+            }
+            .chart-container {
+                flex-grow: 1;
+                margin-right: 10px; /* Adjust margin as needed */
+                padding-left: 450px; /* Added padding to the left */
+            }
+            .filter-container {
+                flex-basis: 200px; /* Adjust width as needed */
+                padding-right: 100px; /* Added padding to the left */
+                padding-top: 100px; /* Added padding to the left */
+            }
+        </style>
+    </head>
+    <body>
+    <div class="container">
+        <div class="chart-container" id="chart"></div>
+        <div class="filter-container">
+            <h3>Filtering Option</h3>
+            <input type="checkbox" id="confusion-very-high" checked> Very High Confusion<br>
+            <input type="checkbox" id="confusion-high" checked> High Confusion<br>
+            <input type="checkbox" id="confusion-medium" checked> Medium Confusion<br>
+            <input type="checkbox" id="confusion-low" checked> Low Confusion<br><br>
+            <input type="checkbox" id="supernatural-low" checked> Low Supernatural<br>
+            <input type="checkbox" id="supernatural-high" checked> High Supernatural<br>
+        </div>
+    </div>
+    <script>
+        const dataUrl = 'aggregate.json';
+
+        fetch(dataUrl)
+            .then(response => response.json())
+            .then(data => {
+                const sightings = data.bigfootdata;
+                initChart(sightings);
+            })
+            .catch(error => console.error(error));
+
+        function initChart(sightings) {
+            const margin = { top: 20, right: 20, bottom: 62, left: 50 };
+            const width = 960 - margin.left - margin.right;
+            const height = 420 - margin.top - margin.bottom;
+
+            // Define scales
+            const xScale = d3.scaleBand()
+                .domain(sightings.map(d => d.State))
+                .range([0, width])
+                .padding(0.1);
+
+            const yScale = d3.scaleLinear()
+                .domain([0, d3.max(sightings, d => +d.Count_Bigfoot_sightings)])
+                .range([height, 0]);
+
+            // Create SVG
+            const svg = d3.select('#chart')
+                .append('svg')
+                .attr('width', width + margin.left + margin.right)
+                .attr('height', height + margin.top + margin.bottom)
+                .append('g')
+                .attr('transform', `translate(${margin.left}, ${margin.top})`);
+
+            // Selected confusion levels (initially all checked)
+            let selectedConfusionLevels = ['Very High', 'High', 'Medium', 'Low'];
+
+            // Selected supernatural levels (initially all checked)
+            let selectedSupernaturalLevels = ['Low', 'High'];
+
+            // Draw the static legends
+            drawLegends(svg, width, height);
+
+            // Function to update chart based on filters
+            const updateData = () => {
+                const filteredSightings = sightings.filter(d =>
+                    selectedConfusionLevels.includes(d.Confusion) &&
+                    selectedSupernaturalLevels.includes(d.Supernatural)
+                );
+
+                // Update data points based on filters
+                svg.selectAll('.data-point')
+                    .data(filteredSightings)
+                    .join(
+                        enter => enter.append('path')
+                            .attr('class', 'data-point')
+                            .attr('d', d => {
+                                if (d.Supernatural === 'Low') return d3.symbol().type(d3.symbolCircle)();
+                                else if (d.Supernatural === 'High') return d3.symbol().type(d3.symbolTriangle)();
+                            })
+                            .attr('transform', d => `translate(${xScale(d.State) + xScale.bandwidth() / 2}, ${yScale(+d.Count_Bigfoot_sightings)})`)
+                            .attr('fill', d => {
+                                if (d.Confusion === 'Very High') return 'red';
+                                else if (d.Confusion === 'High') return 'orange';
+                                else if (d.Confusion === 'Medium') return 'yellow';
+                                else if (d.Confusion === 'Low') return 'green';
+                                else return 'blue'; // Default color
+                            })
+                            .attr('stroke', 'white')
+                            .attr('stroke-width', 1)
+                            .on('mouseover', (event, d) => {
+                                tooltip.style('visibility', 'visible')
+                                    .html(`State: ${d.State}<br>Count: ${d.Count_Bigfoot_sightings}`)
+                                    .style('left', (event.pageX + 10) + 'px')
+                                    .style('top', (event.pageY - 15) + 'px');
+                            })
+                            .on('mouseout', () => {
+                                tooltip.style('visibility', 'hidden');
+                            }),
+                        update => update
+                            .attr('transform', d => `translate(${xScale(d.State) + xScale.bandwidth() / 2}, ${yScale(+d.Count_Bigfoot_sightings)})`)
+                            .attr('fill', d => {
+                                if (d.Confusion === 'Very High') return 'red';
+                                else if (d.Confusion === 'High') return 'orange';
+                                else if (d.Confusion === 'Medium') return 'yellow';
+                                else if (d.Confusion === 'Low') return 'green';
+                                else return 'blue'; // Default color
+                            }),
+                        exit => exit.remove()
+                    );
+            };
+
+            // Update on initial load
+            updateData();
+
+            // Event listeners for the filter checkboxes
+            d3.select('#confusion-very-high').on('change', function() {
+                updateSelectedLevels(this.checked, 'Very High', selectedConfusionLevels);
+                updateData();
+            });
+
+            d3.select('#confusion-high').on('change', function() {
+                updateSelectedLevels(this.checked, 'High', selectedConfusionLevels);
+                updateData();
+            });
+
+            d3.select('#confusion-medium').on('change', function() {
+                updateSelectedLevels(this.checked, 'Medium', selectedConfusionLevels);
+                updateData();
+            });
+
+            d3.select('#confusion-low').on('change', function() {
+                updateSelectedLevels(this.checked, 'Low', selectedConfusionLevels);
+                updateData();
+            });
+
+            d3.select('#supernatural-low').on('change', function() {
+                updateSelectedLevels(this.checked, 'Low', selectedSupernaturalLevels);
+                updateData();
+            });
+
+            d3.select('#supernatural-high').on('change', function() {
+                updateSelectedLevels(this.checked, 'High', selectedSupernaturalLevels);
+                updateData();
+            });
+
+            // Function to update the selected levels array
+            function updateSelectedLevels(isChecked, level, selectedLevels) {
+                if (isChecked) {
+                    if (!selectedLevels.includes(level)) {
+                        selectedLevels.push(level);
+                    }
+                } else {
+                    const index = selectedLevels.indexOf(level);
+                    if (index > -1) {
+                        selectedLevels.splice(index, 1);
+                    }
+                }
+            }
+
+
+            function drawLegends(svg, width, height) {
+                // Add X axis
+                svg.append('g')
+                    .attr('transform', `translate(0, ${height})`)
+                    .call(d3.axisBottom(xScale))
+                    .selectAll('text')
+                    .style('text-anchor', 'end')
+                    .attr('dx', '-.8em')
+                    .attr('dy', '.15em')
+                    .attr('transform', 'rotate(-45)');
+
+                // Add Y axis
+                svg.append('g')
+                    .call(d3.axisLeft(yScale));
+
+                // Add legend for Confusion attribute
+                const legend = svg.append('g')
+                    .attr('class', 'legend')
+                    .attr('transform', `translate(${width - 165}, 20)`);
+
+                const legendData = ['Very High', 'High', 'Medium', 'Low'];
+                const legendColors = ['red', 'orange', 'yellow', 'green'];
+
+                // title
+                legend.append('text')
+                    .attr('x', 0)
+                    .attr('y', -20)
+                    .attr('font-weight', 'bold')
+                    .text('Animal Confusion');
+
+                legend.selectAll('.legend-item')
+                    .data(legendData)
+                    .enter()
+                    .append('g')
+                    .attr('class', 'legend-item')
+                    .attr('transform', (d, i) => `translate(0, ${i * 20})`);
+
+                legend.selectAll('.legend-item')
+                    .append('rect')
+                    .attr('x', 0)
+                    .attr('y', 0)
+                    .attr('width', 10)
+                    .attr('height', 10)
+                    .attr('fill', (d, i) => legendColors[i]);
+
+                legend.selectAll('.legend-item')
+                    .append('text')
+                    .attr('x', 15)
+                    .attr('y', 9)
+                    .attr('dy', '.35em')
+                    .text(d => d);
+
+                // Add legend for Supernatural attribute
+                const shapeLegend = svg.append('g')
+                    .attr('class', 'legend')
+                    .attr('transform', `translate(${width - 165}, 150)`);
+
+                // title
+                shapeLegend.append('text')
+                    .attr('x', 0)
+                    .attr('y', -20)
+                    .attr('font-weight', 'bold')
+                    .text('Supernatural Belief (UFO)');
+
+                shapeLegend.append('path')
+                    .attr('d', d3.symbol().type(d3.symbolCircle)())
+                    .attr('fill', 'none')
+                    .attr('stroke', 'black')
+                    .attr('stroke-width', 1)
+                    .attr('transform', 'translate(0, 0)');
+
+                shapeLegend.append('text')
+                    .attr('x', 15)
+                    .attr('y', 5)
+                    .attr('dy', '.35em')
+                    .text('Low');
+
+                shapeLegend.append('path')
+                    .attr('d', d3.symbol().type(d3.symbolTriangle)())
+                    .attr('fill', 'none')
+                    .attr('stroke', 'black')
+                    .attr('stroke-width', 1)
+                    .attr('transform', 'translate(0, 20)');
+
+                shapeLegend.append('text')
+                    .attr('x', 15)
+                    .attr('y', 25)
+                    .attr('dy', '.35em')
+                    .text('High');
+
+                // Tooltip
+                const tooltip = d3.select('#chart')
+                    .append('div')
+                    .attr('class', 'tooltip')
+                    .style('position', 'absolute')
+                    .style('visibility', 'hidden');
+        }
+        }
+      </script>
+   </body>
+</html>
