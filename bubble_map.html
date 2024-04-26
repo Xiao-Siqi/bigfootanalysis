@@ -1,55 +1,43 @@
 <!DOCTYPE html>
 <html>
 <head>
-   <meta charset="utf-8">
-   <title>Bubble Map</title>
-   <script src="https://d3js.org/d3.v4.min.js"></script>
-   <script src="https://d3js.org/topojson.v2.min.js"></script>
-   <script src="https://cdn.jsdelivr.net/npm/density-clustering@1.3.0/lib/DBSCAN.min.js"></script>
-   <style>
-     body, html {
-       height: 100%;
-       margin: 0;
-       display: flex;
-       justify-content: center;
-       align-items: center;
-     }
-     .container {
-       display: flex;
-       flex-direction: column;
-       align-items: center;
-       justify-content: center;
-     }
-     .map-container, .controls-container {
-       width: 100%;
-       display: flex;
-       justify-content: center;
-       align-items: center;
-     }
-     .map-container {
-       padding: 20px;
-     }
-     .controls-container {
-       margin-top: 20px;
-     }
-     .states {
-       fill: #f6a071;
-     }
-     .state-borders {
-       fill: none;
-       stroke: #fff;
-       stroke-width: 0.5px;
-       stroke-linejoin: round;
-       stroke-linecap: round;
-       pointer-events: none;
-     }
-     .bubble {
-       fill: #c91515;
-       fill-opacity: 0.7;
-       stroke: #fff;
-       stroke-width: 1.5px;
-     }
-   </style>
+    <meta charset="utf-8">
+    <title>Bubble Map</title>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://d3js.org/topojson.v2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/density-clustering@1.3.0/lib/DBSCAN.min.js"></script>
+    <style>
+        .container {
+            display: flex;
+            justify-content: center; /* Centers the items horizontally */
+            align-items: flex-start; /* Align items from the start vertically */
+        }
+        .map-container {
+            flex: 1 1 auto; /* Allows the map to grow and shrink as needed */
+            padding: 0 50px; /* Adds padding on the left and right */
+        }
+        .controls-container {
+            flex: 0 0 250px; /* Fixed width for controls */
+            padding-top: 20px; /* Adds some padding at the top */
+        }
+        .states {
+            fill: #f6a071;
+        }
+        .state-borders {
+            fill: none;
+            stroke: #fff;
+            stroke-width: 0.5px;
+            stroke-linejoin: round;
+            stroke-linecap: round;
+            pointer-events: none;
+        }
+        .bubble {
+            fill: #c91515;
+            fill-opacity: 0.7;
+            stroke: #fff;
+            stroke-width: 1.5px;
+        }
+    </style>
   </head>
   <body>
    <div class="container">
