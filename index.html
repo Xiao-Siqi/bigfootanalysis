@@ -113,13 +113,14 @@
       </div>
       <div class="content-container">
          <h3>Bubble Map</h3>
-         <iframe src="bubble_map.html" width="100%" height="600"></iframe>
+         <iframe src="bubble_map.html" width="100%" height="620"></iframe>
          <div class = "text-description">
-            <p>The Bubble Map visualizes the geographic distribution of Bigfoot sightings, drawing from the "Longitude" and "Latitude" fields in our dataset. <strong>Each bubble's size on the map corresponds to the number of 
-               sightings in that particular area<strong>, offering a spatial analysis of these events. This visualization aids in understanding the geographical spread and cultural penetration of Bigfoot sightings across the United States.
-            <li>In regions such as the <strong>Pacific Northwest and the Great Lakes area<strong>, the bubbles are significantly larger, indicating a higher frequency of reported sightings. 
-               <li>This phenomenon may be influenced by the dense forest cover and associated folklore prevalent in these regions.</li></li>
-            <li>The map also highlights smaller, yet notable concentrations of sightings in areas like <strong>Florida and Texas<strong>, suggesting that Bigfoot legends are not confined to colder, forested regions alone.</li>
+            <p>The Bubble Map visualizes the geographic distribution of Bigfoot sightings, drawing from the "Longitude" and "Latitude" fields in our dataset. Each bubble's size is determined by the number of sightings in that area, and bubbles are optionally clustered together based on proximity and density, adjustable via user controls for "Epsilon" and "MinPts". The map is designed to be interactive, allowing users to adjust clustering settings and instantly see changes in the visualization offering a spatial analysis of these events. This visualization aids in understanding the geographical spread and cultural penetration of Bigfoot sightings across the United States.
+            <ul>
+            <li>In regions such as the <strong>Pacific Northwest and the Great Lakes area</strong>, the bubbles are significantly larger, indicating a higher frequency of reported sightings. 
+            <li>This phenomenon may be influenced by the dense forest cover and associated folklore prevalent in these regions.</li></li>
+            <li>The map also highlights smaller, yet notable concentrations of sightings in areas like <strong>Florida and Texas</strong>, suggesting that Bigfoot legends are not confined to colder, forested regions alone.</li>
+            </ul>
             </p>
          </div>
       </div>
@@ -127,8 +128,13 @@
          <h3>Scatterplot</h3>
          <iframe src="scatterplot_shapes.html" width="100%" height="450"></iframe>
          <div class = "text-description">
-            <p class="description">This scatterplot differentiates sightings by confusion and supernatural belief, using color and shape coding respectively.</p>
-            <p class="findings">There appears to be no strong correlation between the level of confusion and supernatural belief in these sightings.</p>
+            <p>The Scatterplot visualizes Bigfoot sightings data, strategically employing attributes such as "State", "Count_Bigfoot_sightings", "Confusion", and "Supernatural" to enrich the analysis. Each point's position on the x-axis corresponds to the state where the sighting occurred, while the y-axis represents the count of sightings reported in that state, offering a quantitative assessment of Bigfoot encounters across different regions. Points are color-coded based on the "Confusion" level associated with each sighting, ranging from "Very High" to "Low", illustrating the clarity of the witness accounts. Additionally, the shape of each point differs according to the "Supernatural" belief level, with circles representing "Low" and triangles for "High" supernatural elements reported, providing insight into the psychological context of the sightings.
+            <ul>
+            <li>This visualization not only depicts geographical distribution but also integrates a layer of qualitative data reflecting the subjective experiences of the witnesses, thereby adding depth to the conventional numerical data representation.</li>
+            <li>The scatterplot is equipped with interactive filtering options that allow users to selectively view data based on confusion and supernatural levels. This interactivity enables users to explore patterns, such as correlations between high confusion levels and supernatural claims, which might suggest psychological factors influencing the reports.</li>
+            <li>For example, states like <strong>Washington and California</strong>, known for their rich folklore, show a higher frequency of sightings with varied confusion and supernatural levels, indicating cultural influences on the reports. Conversely, sightings in more urbanized states like <strong>New York and New Jersey</strong> show lower overall sightings but with higher confusion levels, possibly reflecting urban myths or misidentifications.</li>
+            </ul>
+            </p>
          </div>
       </div>
       <!-- <div>
