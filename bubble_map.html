@@ -1,190 +1,189 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
-    <title>Bubble Map</title>
-    <script src="https://d3js.org/d3.v4.min.js"></script>
-    <script src="https://d3js.org/topojson.v2.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/density-clustering@1.3.0/lib/DBSCAN.min.js"></script>
-    <style>
-        .container {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
-        .map-container {
-            flex-grow: 1;
-        }
-        .controls-container {
-            flex-basis: 200px; /* Adjust width as needed */
-            margin-left: 20px; /* Adjust margin as needed */
-        }
-        .states {
-            fill: #f6a071;
-        }
-        .state-borders {
-            fill: none;
-            stroke: #fff;
-            stroke-width: 0.5px;
-            stroke-linejoin: round;
-            stroke-linecap: round;
-            pointer-events: none;
-        }
-        .bubble {
-            fill: #c91515;
-            fill-opacity: 0.7;
-            stroke: #fff;
-            stroke-width: 1.5px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="map-container">
-            <svg width="960" height="600"></svg>
-        </div>
-        <div class="controls-container">
+   <head>
+      <meta charset="utf-8">
+      <title>Bubble Map</title>
+      <script src="https://d3js.org/d3.v4.min.js"></script>
+      <script src="https://d3js.org/topojson.v2.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/density-clustering@1.3.0/lib/DBSCAN.min.js"></script>
+      <style>
+         .container {
+         display: flex;
+         flex-direction: row;
+         justify-content: space-between;
+         align-items: flex-start;
+         }
+         .map-container {
+         flex-grow: 1;
+         }
+         .controls-container {
+         flex-basis: 200px; /* Adjust width as needed */
+         margin-left: 20px; /* Adjust margin as needed */
+         }
+         .states {
+         fill: #f6a071;
+         }
+         .state-borders {
+         fill: none;
+         stroke: #fff;
+         stroke-width: 0.5px;
+         stroke-linejoin: round;
+         stroke-linecap: round;
+         pointer-events: none;
+         }
+         .bubble {
+         fill: #c91515;
+         fill-opacity: 0.7;
+         stroke: #fff;
+         stroke-width: 1.5px;
+         }
+      </style>
+   </head>
+   <body>
+      <div class="container">
+         <div class="map-container">
+            <svg width="960" height="960"></svg>
+         </div>
+         <div class="controls-container">
             <div id="controls">
-                <label for="epsilon">Epsilon (max distance between points):</label>
-                <input type="number" id="epsilon" value="5">
-                <br>
-                <label for="minPts">MinPts (min number of points to form a cluster):</label>
-                <input type="number" id="minPts" value="5">
-                <br>
-                <label for="clustering">Enable Clustering:</label>
-                <input type="checkbox" id="clustering" checked>
+               <label for="epsilon">Epsilon (max distance between points):</label>
+               <input type="number" id="epsilon" value="5">
+               <br>
+               <label for="minPts">MinPts (min number of points to form a cluster):</label>
+               <input type="number" id="minPts" value="5">
+               <br>
+               <label for="clustering">Enable Clustering:</label>
+               <input type="checkbox" id="clustering" checked>
             </div>
             <svg id="cluster-size" width="200" height="30">
-                <text x="10" y="20">Cluster Size: </text>
+               <text x="10" y="20">Cluster Size: </text>
             </svg>
-        </div>
-    </div>
-    <script>
-
-        var svg = d3.select("svg"),
-            width = +svg.attr("width"),
-            height = +svg.attr("height");
-
-        var projection = d3.geoAlbersUsa()
-            .translate([width / 2, height / 2])
-            .scale(1260);
-
-        var path = d3.geoPath(); //.projection(projection);
-
-        // Draw the map
-        d3.json("https://d3js.org/us-10m.v1.json", function(error, us) {
-            if (error) throw error;
-
-            // Append a group for the map and draw it
-            var mapGroup = svg.append('g').attr('id', 'mapGroup');
-
-            mapGroup.selectAll("path")
-                .data(topojson.feature(us, us.objects.states).features)
-                .enter().append("path")
-                .attr("class", "state")
-                .attr("d", path);
-
-            mapGroup.append("path")
-                .attr("class", "state-borders")
-                .attr("d", path(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; })));
-
-            // Now that the map is drawn, add the bubbles on top
-            addBubbles();
-        });
-
-        function addBubbles() {
-            d3.json("aggregate.json", function(error, data) {
-                if (error) throw error;
-
-                var entries = data.bigfootdata;
-                //console.log("Data loaded:", entries); // Verify data is loaded correctly
-
-                var epsilon = +document.getElementById("epsilon").value;
-                var minPts = +document.getElementById("minPts").value;
-                var clusteringEnabled = document.getElementById("clustering").checked;
-
-                // Prepare the data for clustering
-                var coords = entries.map(function(entry) {
-                    var projected = projection([+entry.Longitude, +entry.Latitude]);
-                    return projected ? [projected[0], projected[1]] : null;
-                }).filter(function(d) { // Filter out any null values
-                    return d !== null;
-                });
-
-                if (clusteringEnabled) {
-                    // Perform DBSCAN clustering
-                    var dbscan = new DBSCAN();
-                    var clusters = dbscan.run(coords, epsilon, minPts);
-
-                    // Remove existing bubbles
-                    svg.selectAll('.bubble').remove();
-
-                    // Draw the clusters on the map
-                    clusters.forEach(function(cluster) {
-                        if (cluster.length === 0) return; // Skip empty clusters
-
-                        // Calculate the centroid of the cluster
-                        var centroid = cluster.reduce(function(accumulator, index) {
-                            accumulator[0] += coords[index][0]; // X coordinate
-                            accumulator[1] += coords[index][1]; // Y coordinate
-                            return accumulator;
-                        }, [0, 0]);
-
-                        centroid[0] /= cluster.length; // Average X coordinate
-                        centroid[1] /= cluster.length; // Average Y coordinate
-
-                        // Draw the bubble at the centroid location
-                        var bubble = svg.append("circle")
-                            .attr("class", "bubble")
-                            .attr("cx", centroid[0])
-                            .attr("cy", centroid[1])
-                            .attr("r", Math.sqrt(cluster.length) * 3)
-                            .attr("fill-opacity", 0.7)
-                            .attr("fill", "blue")
-                            .attr("stroke", "white")
-                            .attr("stroke-width", 1.5);
-                            
-                        // Add event listener to each bubble for mouseover
-                        bubble.on('mouseover', function() {
-                            updateClusterSizeText(cluster.length);
-                        });
-                    });
-                } else {
-                    // Show single points without clustering
-                    svg.selectAll('.bubble').remove();
-
-                    // Draw each point as a single circle
-                    coords.forEach(function(coord) {
-                        var bubble = svg.append("circle")
-                            .attr("class", "bubble")
-                            .attr("cx", coord[0])
-                            .attr("cy", coord[1])
-                            .attr("r", 3)
-                            .attr("fill-opacity", 0.7)
-                            .attr("fill", "blue")
-                            .attr("stroke", "white")
-                            .attr("stroke-width", 1.5);
-
-                        // Add event listener to each bubble for mouseover
-                        bubble.on('mouseover', function() {
-                            updateClusterSizeText(1); // For single points, set size to 1
-                        });
-                    });
-                }
-            });
-        }
-
-        // Add event listeners to update bubbles on input change
-        document.getElementById("epsilon").addEventListener("change", addBubbles);
-        document.getElementById("minPts").addEventListener("change", addBubbles);
-        document.getElementById("clustering").addEventListener("change", addBubbles);
-
-        // Function to update cluster size text
-        function updateClusterSizeText(size) {
-            d3.select("#cluster-size text").text("Cluster Size: " + size);
-        }
-
-    </script>
-</body>
+         </div>
+      </div>
+      <script>
+         var svg = d3.select("svg"),
+             width = +svg.attr("width"),
+             height = +svg.attr("height");
+         
+         var projection = d3.geoAlbersUsa()
+             .translate([width / 2, height / 2])
+             .scale(1260);
+         
+         var path = d3.geoPath(); //.projection(projection);
+         
+         // Draw the map
+         d3.json("https://d3js.org/us-10m.v1.json", function(error, us) {
+             if (error) throw error;
+         
+             // Append a group for the map and draw it
+             var mapGroup = svg.append('g').attr('id', 'mapGroup');
+         
+             mapGroup.selectAll("path")
+                 .data(topojson.feature(us, us.objects.states).features)
+                 .enter().append("path")
+                 .attr("class", "state")
+                 .attr("d", path);
+         
+             mapGroup.append("path")
+                 .attr("class", "state-borders")
+                 .attr("d", path(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; })));
+         
+             // Now that the map is drawn, add the bubbles on top
+             addBubbles();
+         });
+         
+         function addBubbles() {
+             d3.json("aggregate.json", function(error, data) {
+                 if (error) throw error;
+         
+                 var entries = data.bigfootdata;
+                 //console.log("Data loaded:", entries); // Verify data is loaded correctly
+         
+                 var epsilon = +document.getElementById("epsilon").value;
+                 var minPts = +document.getElementById("minPts").value;
+                 var clusteringEnabled = document.getElementById("clustering").checked;
+         
+                 // Prepare the data for clustering
+                 var coords = entries.map(function(entry) {
+                     var projected = projection([+entry.Longitude, +entry.Latitude]);
+                     return projected ? [projected[0], projected[1]] : null;
+                 }).filter(function(d) { // Filter out any null values
+                     return d !== null;
+                 });
+         
+                 if (clusteringEnabled) {
+                     // Perform DBSCAN clustering
+                     var dbscan = new DBSCAN();
+                     var clusters = dbscan.run(coords, epsilon, minPts);
+         
+                     // Remove existing bubbles
+                     svg.selectAll('.bubble').remove();
+         
+                     // Draw the clusters on the map
+                     clusters.forEach(function(cluster) {
+                         if (cluster.length === 0) return; // Skip empty clusters
+         
+                         // Calculate the centroid of the cluster
+                         var centroid = cluster.reduce(function(accumulator, index) {
+                             accumulator[0] += coords[index][0]; // X coordinate
+                             accumulator[1] += coords[index][1]; // Y coordinate
+                             return accumulator;
+                         }, [0, 0]);
+         
+                         centroid[0] /= cluster.length; // Average X coordinate
+                         centroid[1] /= cluster.length; // Average Y coordinate
+         
+                         // Draw the bubble at the centroid location
+                         var bubble = svg.append("circle")
+                             .attr("class", "bubble")
+                             .attr("cx", centroid[0])
+                             .attr("cy", centroid[1])
+                             .attr("r", Math.sqrt(cluster.length) * 3)
+                             .attr("fill-opacity", 0.7)
+                             .attr("fill", "blue")
+                             .attr("stroke", "white")
+                             .attr("stroke-width", 1.5);
+                             
+                         // Add event listener to each bubble for mouseover
+                         bubble.on('mouseover', function() {
+                             updateClusterSizeText(cluster.length);
+                         });
+                     });
+                 } else {
+                     // Show single points without clustering
+                     svg.selectAll('.bubble').remove();
+         
+                     // Draw each point as a single circle
+                     coords.forEach(function(coord) {
+                         var bubble = svg.append("circle")
+                             .attr("class", "bubble")
+                             .attr("cx", coord[0])
+                             .attr("cy", coord[1])
+                             .attr("r", 3)
+                             .attr("fill-opacity", 0.7)
+                             .attr("fill", "blue")
+                             .attr("stroke", "white")
+                             .attr("stroke-width", 1.5);
+         
+                         // Add event listener to each bubble for mouseover
+                         bubble.on('mouseover', function() {
+                             updateClusterSizeText(1); // For single points, set size to 1
+                         });
+                     });
+                 }
+             });
+         }
+         
+         // Add event listeners to update bubbles on input change
+         document.getElementById("epsilon").addEventListener("change", addBubbles);
+         document.getElementById("minPts").addEventListener("change", addBubbles);
+         document.getElementById("clustering").addEventListener("change", addBubbles);
+         
+         // Function to update cluster size text
+         function updateClusterSizeText(size) {
+             d3.select("#cluster-size text").text("Cluster Size: " + size);
+         }
+         
+      </script>
+   </body>
 </html>
