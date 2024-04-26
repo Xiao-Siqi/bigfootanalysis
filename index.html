@@ -1,149 +1,316 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Data Visualization Tabs</title>
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            padding-top: 20px;
-        }
-        .vertical-tabs {
-            width: 200px; /* Adjust width of the tabs */
-            background-color: maroon; /* Menu background color */
-            position: fixed;
-            height: 100%;
-            overflow-y: auto;
-            transition: width 0.3s;
-        }
-        .nav-link {
-            color: orange; /* Menu text color */
-        }
-        .tab-content {
-            margin-left: 200px;
-            width: calc(100% - 200px);
-            transition: margin-left 0.3s, width 0.3s;
-        }
-        .content-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        #toggle-menu {
-            cursor: pointer;
-            position: absolute;
-            top: 20px;
-            left: 200px;
-            z-index: 1000;
-            color: orange; /* Icon color */
-        }
-    </style>
-</head>
-<body>
-    <div id="toggle-menu">&#9776;</div>
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-3 vertical-tabs">
-                <h1 class="project-title">Exploring Bigfoot</h1>
-                <h2 class="project-subtitle">Insights Through Visualizations</h2>
-                <ul class="nav nav-pills flex-column" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link active" data-toggle="tab" href="#wordCloud">Word Cloud</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#barChart">Bar Chart Race</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#lineChart">Line Chart Witness Count</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#bubbleMap">Bubble Map</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#scatterplot">Scatterplot</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#extra">Extra Content</a>
-                    </li>
-                </ul>
+   <head>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>USC Data Science - UFO Database</title>
+      <!-- Bootstrap Core CSS -->
+      <link href="css/bootstrap.min.css" rel="stylesheet">
+      <!-- Scrolling Nav CSS -->
+      <link href="css/scrolling-nav.css" rel="stylesheet">
+      <!-- Custom CSS -->
+      <link href="css/styles.css" rel="stylesheet">
+      <script src="https://d3js.org/topojson.v2.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/density-clustering@1.3.0/lib/DBSCAN.min.js"></script>
+      <style>
+         .content-container {
+         display: flex;
+         flex-wrap: wrap;
+         flex-direction: column;
+         align-items: center;
+         justify-content: space-around; /*option:center*/
+         width: 100%; /* Adjust width as necessary */
+         margin-top: 7%; /* Your existing margin */
+         }
+         .text-description {
+         flex: 1 1 40%; /* Flex basis of 40% allows this to grow or shrink */
+         max-width: 50%; /* Adjust the max-width as needed */
+         margin: 10px;
+         padding: 20px;
+         background-color: #f9f9f9; /* Light background for the text */
+         border-radius: 10px;
+         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Adds a subtle shadow */
+         }
+         .states {
+         fill: #f6a071;
+         }
+         .state-borders {
+         fill: none;
+         stroke: #fff;
+         stroke-width: 0.5px;
+         stroke-linejoin: round;
+         stroke-linecap: round;
+         pointer-events: none;
+         }
+         #controls {
+         margin-top: 20px;
+         }
+      </style>
+   </head>
+   <!-- The #page-top ID is part of the scrolling feature - the data-spy and data-target are part of the built-in Bootstrap scrollspy function -->
+   <body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top">
+      <!-- Navigation -->
+      <div id="nav-main">
+         <nav class="navbar mav-main navbar-default navbar-fixed-top" role="navigation">
+            <div class="container">
+               <div class="navbar-header page-scroll">
+                  <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                  <span class="sr-only">Toggle navigation</span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                  </button>
+               </div>
+               <div class="collapse navbar-collapse navbar-ex1-collapse">
+                  <nav id="nav-wrap">
+                     <ul class="nav navbar-nav navbar-custom">
+                        <li class="current"><a class="page-scroll" href="#page-top" style="color:white">Home</a></li>
+                        <li class="hidden"><a class="page-scroll" href="#page-top" style="color:white"></a></li>
+                        <li><a class="page-scroll" href="#about" style="color:#ffffff">About</a></li>
+                        <li><a class="page-scroll" href="#features" style="color:#ffffff">Insights</a></li>
+                        <li><a class="page-scroll" style="color:#ffffff" href="#learn-more">Search</a></li>
+                        <li><a class="page-scroll" style="color:#ffffff" href="#learn-more">Partners</a></li>
+                     </ul>
+                  </nav>
+                  <a href="http://usc.edu" class="pull-right">
+                  <img src="images/usc-primary-logotype.svg" width="176px" height="38px">
+                  </a>
+               </div>
             </div>
-            <div class="col-md-9 tab-content">
-                <div class="tab-pane active" id="wordCloud">
-                    <div class="content-container">
-                        <h3>Word Cloud</h3>
-                        <iframe width="50%" height="682" frameborder="0" src="https://observablehq.com/embed/@siqix/dsci550_hw3@495?cells=wordCloudSVG3&api_key=a52bda0a48ae999804e4de822a74c0f4fcbd2668"></iframe>
-                        <p class="description">This word cloud visualizes the most frequently mentioned terms in reported Bigfoot sightings.</p>
-                        <p class="findings">Key findings indicate that 'forest', 'night', and 'large' are commonly associated with sightings, suggesting typical conditions or perceptions during encounters.</p>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="barChart">
-                    <div class="content-container">
-                        <h3>Bar Chart Race</h3>
-                        <iframe width="100%" height="682" frameborder="0" src="https://observablehq.com/embed/@siqix/dsci550_hw3@495?cells=chart&api_key=5a7693f630968b6f696d91b02678aea8288b2ee8"></iframe>
-                        <p class="description">This dynamic bar chart race shows the changing frequencies of sightings over time across different states.</p>
-                        <p class="findings">The race highlights spikes in sightings which may correlate with media events or changes in public interest.</p>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="lineChart">
-                    <div class="content-container">
-                        <h3>Line Chart Witness Count</h3>
-                        <iframe width="100%" height="600" frameborder="0" src="https://observablehq.com/embed/@siqix/dsci550_hw3@495?cells=chart1&api_key=5a7693f630968b6f696d91b02678aea8288b2ee8"></iframe>
-                        <p class="description">This line chart tracks the number of witnesses per sighting, providing insights into the social aspects of these reports.</p>
-                        <p class="findings">Most sightings are reported by individuals or small groups, which may affect the reliability of the reports.</p>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="bubbleMap">
-                    <div class="content-container">
-                        <h3>Bubble Map</h3>
-                        <iframe src="bubble_map.html" width="100%" height="500px"></iframe>
-                        <p class="description">This geographic visualization maps the density of sightings using bubbles, scaled by the number of reports per location.</p>
-                        <p class="findings">High-density areas may indicate regions with greater public awareness or actual clusters of activity.</p>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="scatterplot">
-                    <div class="content-container">
-                        <h3>Scatterplot</h3>
-                        <iframe src="scatterplot_shapes.html" width="100%" height="500px"></iframe>
-                        <p class="description">This scatterplot differentiates sightings by confusion and supernatural belief, using color and shape coding respectively.</p>
-                        <p class="findings">There appears to be no strong correlation between the level of confusion and supernatural belief in these sightings.</p>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="extra">
-                    <div class="content-container">
-                        <h3>Extra Content</h3>
-                        <!-- Any extra content -->
-                        <p>This section can be used to display additional analyses or miscellaneous insights related to the data.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script>
-        const toggleMenu = document.getElementById('toggle-menu');
-        const verticalTabs = document.querySelector('.vertical-tabs');
-        const tabContent = document.querySelector('.tab-content');
-        let menuVisible = true;
-
-        toggleMenu.addEventListener('click', function() {
-            if (menuVisible) {
-                verticalTabs.style.width = '0';
-                toggleMenu.style.left = '0';
-                tabContent.style.marginLeft = '0';
-                tabContent.style.width = '100%';
-            } else {
-                verticalTabs.style.width = '200px';
-                toggleMenu.style.left = '200px';
-                tabContent.style.marginLeft = '200px';
-                tabContent.style.width = 'calc(100% - 200px)';
-            }
-            menuVisible = !menuVisible;
-        });
-    </script>
-</body>
+         </nav>
+      </div>
+      <!-- Intro Section -->
+      <!-- Visualization Starts Here -->
+      <div class="content-container">
+         <h3>Word Cloud</h3>
+         <iframe width="50%" height="500" frameborder="0"
+            src="https://observablehq.com/embed/@siqix/dsci550_hw3@495?cells=wordCloudSVG3&api_key=a52bda0a48ae999804e4de822a74c0f4fcbd2668"></iframe>
+         <div class = "text-description">
+            <p>
+               This word cloud was generated from the "caption" field of the dataset, following our extensive data engineering and analysis with Natural Language Processing (NLP) techniques. It effectively highlights the most prevalent words found in eyewitness accounts of Bigfoot encounters.
+            <ul>
+               <li><strong>The frequent occurrence of the word "like" is particularly notable.</strong> Upon closer examination, we deduced that it often reflects a degree of uncertainty in the witnesses' accounts, betraying a subconscious hesitancy about their experiences. Typically, it is used in contexts such as "animal-like creature" (for instance, "I saw a creature resembling a bear darting before me").</li>
+               <li><strong>The words "saw" and "heard" are also prominent.</strong> This suggests that eyewitness accounts and auditory experiences play a crucial role in these sightings. However, there is an undercurrent of doubt inherent in these personal narratives.</li>
+            </ul>
+            </p>
+         </div>
+      </div>
+      <div class="content-container">
+         <h3>Bar Chart Race</h3>
+         <iframe width="50%" height="682" frameborder="0"
+            src="https://observablehq.com/embed/@siqix/dsci550_hw3@495?cells=chart&api_key=5a7693f630968b6f696d91b02678aea8288b2ee8"></iframe>
+         <div class = "text-description">
+            <p>
+               The Bar Chart Race visualizes the temporal distribution of sighting counts, utilizing data from the "year" and "state" columns after distilling essential information from the textual descriptions. It illustrates the historical trends of reports in the U.S., highlighting notable periods.
+            <ul>
+               <li>In <strong>1949</strong>, we observe a significant uptick as more states begin to report sightings.</li>
+               <li>The year <strong>1960</strong> marks a rapid escalation in reports, showcasing a remarkable acceleration in the number of encounters.</li>
+               <li>Throughout the recorded history of these reports, <strong>"Washington”, “Ohio”, and “California"</strong> consistently emerge as the top three states with the highest frequency of sightings, probably caused by geographical and cultural influence.</li>
+            </ul>
+            </p>
+         </div>
+      </div>
+      <div class="content-container">
+         <h3>Line Chart Witness Count</h3>
+         <iframe width="50%" height="700" frameborder="0"
+            src="https://observablehq.com/embed/@siqix/dsci550_hw3@495?cells=chart1&api_key=5a7693f630968b6f696d91b02678aea8288b2ee8"></iframe>
+         <div class = "text-description">
+            <p>
+               The Line Chart, drawing from the "witness count" column of our dataset, corroborates the earlier analysis, pinpointing <strong>1960</strong> as a watershed year when reports of Bigfoot sightings surged dramatically.
+               <br> <strong>This chart elucidates two most prominent peaks in reporting—the years 1980 and 2000.</strong> While there is a discernible downward trend post-2000, the volume of reports remains substantial, which may be attributed to the ease of remote communication in modern times, coupled with the enduring popularity of Bigfoot folklore.
+            </p>
+         </div>
+      </div>
+      <div class="content-container">
+         <h3>Bubble Map</h3>
+         <iframe src="bubble_map.html" width="100%" height="500px"></iframe>
+         <p class="description">This geographic visualization maps the density of sightings using bubbles, scaled by the number of reports per location.</p>
+         <p class="findings">High-density areas may indicate regions with greater public awareness or actual clusters of activity.</p>
+      </div>
+      <div class="content-container">
+         <h3>Scatterplot</h3>
+         <iframe src="scatterplot_shapes.html" width="100%" height="500px"></iframe>
+         <p class="description">This scatterplot differentiates sightings by confusion and supernatural belief, using color and shape coding respectively.</p>
+         <p class="findings">There appears to be no strong correlation between the level of confusion and supernatural belief in these sightings.</p>
+      </div>
+      <!-- <div>
+         <section id="intro" class="intro-section" style="background-image: url('images/ufoedited.png'); opacity: 1.0;background-attachment: fixed; background-size: cover;
+           background-repeat: no-repeat;">
+             <div class="container" style="padding-top:100px">
+                 <div class="row">
+                     <div class="col-lg-12" >
+                         <h1 class="title">UFO Data Insights</h1>
+                         <br><a style="text-decoration: none;" href="http://irds.usc.edu/"><h3 id="irdsgroup">USC Data Science</h3></a>
+                     </div>
+                 </div>
+                 <div class="row" style="padding-top:15px">
+                   <div class="col-md-12">
+                     <a class="btn btn-default btn-lg page-scroll" href="#about" style="margin-top:5%">Learn More</a>
+                   </div>
+                 </div>
+                 <div class="row" style="padding-top:180px">
+                     <div class="col-md-3 col-md-offset-1">
+                       <a class="btn btn-default btn-lg page-scroll"
+                       href="html/d3-examples.html">Explore Visualizations</a>
+                     </div>
+         
+                     <div class="col-sm-4"></div>
+                     <div class="col-md-3">
+                       <a class="btn btn-default btn-lg page-scroll pull-left"
+                       href="#" style="width:200px;">Deep Insights</a>
+                     </div>
+                 </div>
+         
+             </div>
+         
+         </section>
+         </div> -->
+      <!-- About Section -->
+      <!-- <div>
+         <section id="about" class="about-section" style="margin-top:-1%; margin-bottom:5%">
+             <div class="container">
+                 <div class="row">
+         
+                     <hr class="about-divider">
+                     <h1>About Us</h1>
+                     <hr class="about-divider">
+         
+                     <div class="jumbotron" style="margin-bottom:5%; margin-top:3%">
+                         <h2>What is UFO Data Insights?</h2>
+                         <p class="lead text-left" style="margin-top:2%">JPL and USC, under the direction of Dr. Chris Mattmann, have worked to collect a corpus of “deep web” UFO datasets spanning many file types containing scientific data such as images, videos, and other information on the Web. These pieces of data were collected using Apache Nutch, Apache Tika, and Apache Solr.</p>
+                         <p class="lead text-left">Our goal is to aggregate this data into an intuitive search engine that scientists can utilize for UFO research. Additionally, the data is analyzed and illustrated using D3.js, providing researchers a better understanding of the data's relationship of UFO sightings.</p>
+                     </div>
+         
+                     <div class="col-md-4">
+                        <div class="media">
+                           <div class="media-left">
+                               <img class="media-object" src="images/searchimg.jpg" alt="...">
+                           </div>
+                           <div class="media-body">
+                               <h4 class="media-heading">Search Engine</h4>
+                               Providing researchers with a powerful tool to find relevant data sets and websites.
+                           </div>
+                         </div>
+                     </div>
+         
+                     <div class="col-md-4">
+                        <div class="media">
+                           <div class="media-left">
+                               <img class="media-object" src="images/visualimg.jpg" alt="...">
+                           </div>
+                           <div class="media-body">
+                               <h4 class="media-heading">Visualizer</h4>
+                               Illustrating data set connections and related terms to narrow searches.
+                           </div>
+                         </div>
+                     </div>
+         
+                     <div class="col-md-4">
+                        <div class="media">
+                           <div class="media-left">
+                               <img class="media-object" src="images/publicizer.png" alt="...">
+                           </div>
+                           <div class="media-body">
+                               <h4 class="media-heading">Publicizer</h4>
+                               Demonstrate the value of these UFO data sets to the NSF, USC, and NASA.
+                           </div>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+         </section>
+         </div> -->
+      <!-- Features Section -->
+      <!-- <div>
+         <section id="features" class="features-section" style="margin-top:-1%; margin-bottom:5%">
+             <div class="container">
+                 <div class="row">
+                     <div class="col-lg-12">
+                         <hr class="featurette-divider">
+                         <h1>Insights</h1>
+                         <hr class="featurette-divider">
+                     </div>
+         
+         
+                     <!--D3.js Feature-->
+      <!-- <hr class="featurette-divider">
+         <div class="row featurette" style="margin-top:3%; margin-bottom:3%">
+             <div class="col-md-7 col-md-push-5">
+               <h2 align=left class="featurette-heading"><a href="https://d3js.org/">D3.js</a>. <span class="text-muted">See for yourself.</span></h2>
+               <p align=left class="lead">View data sets from a variety of sources to better understand UFO relationships. </p>
+               <p align=left class="lead"> <a href="html/d3-examples.html"> View some of our visualizations. </a> </p>
+             </div>
+             <div class="col-md-5 col-md-pull-7">
+               <img class="featurette-image img-responsive center-block" src="images/d3_feature.png" alt="Generic placeholder image">
+             </div>
+         </div>
+         </div>
+         </div>
+         </section>
+         </div> --> -->
+      <!-- Learn More Section -->
+      <!-- <div>
+         <section id="learn-more" class="learn-more-section">
+         	<div class="container">
+         		 <div class="col-lg-12" style="margin-top:8%">
+         			  <hr class="featurette-divider" style="margin-top:-1%">
+         			  <h1 align=center>USC Data Science Partner Sites</h1>
+         			  <hr class="featurette-divider">
+         		 </div>
+         		 <div class="row">
+         		  <div class="col-md-12 col-sm-4 col-xs-4" style="margin-top:3%">
+         			  <div class="panel panel-info">
+         					  <div class="panel-heading">
+         					   <h4><center>IRDS</h4>
+         					  </div>
+         					  <div class="panel-body">
+         						  <p style="font-size: 15pt;">
+         									The Information Retrieval and Data Science Group’s (I.R.D.S.) mission is to research and develop new methodology and open source software to analyze, ingest, process, and manage Big Data and to turn it into
+                            information.
+         						  </p>
+         						  <p style="font-size: 15pt;">
+         							   We have expertise in data collection and contribute to the world's largest and most often downloaded open-source projects, working with NASA, DARPA, DHS, NIH across a number of domains, Earth Science,Planetary Science, Astronomy, defense, and private industry.
+         						  </p>
+         					  </div>
+         
+         					  <div class="panel-footer">
+         						  <center><a href="http://irds.usc.edu/" class="btn btn-info ">Visit IRDS</a>
+         					  </div>
+                               </div>
+         
+         
+         
+                 </div>
+         		</div>
+         		<div class="col-lg-12" style="margin-top:5%;" >
+                         <h3 align=center>Credits</h3>
+                         <hr class="featurette-divider">
+                         <div class="row">
+                         <p>Dr. Chris Mattmann - <a href="http://sunset.usc.edu/~mattmann/">Visit his website</a></p>
+                         <p>CS401 Group (Lorraine Sposto, Jonathan Luu, Ruthvik Peddawandla, Titus Jung, Janet Kim)</p>
+                         <p>CS599 Spring 2018 Class - <a href="http://irds.usc.edu/classes/cs599_2018a/">Visit the class website</a></p>
+                         <p>CS572 Spring 2015 Class - <a href="http://sunset.usc.edu/classes/cs572_2015/">Visit the class website</a></p>
+         		</div>
+                   </div>
+         	</div>
+         </section>
+         </div> -->
+      <hr class="featurette-divider">
+      <div>
+         <div class="container">
+            <footer>
+               <p align=center>©USC Data Science Group 2024, All Rights Reserved</p>
+            </footer>
+         </div>
+      </div>
+      <!-- jQuery -->
+      <script src="js/jquery.js"></script>
+      <!-- Bootstrap Core JavaScript -->
+      <script src="js/bootstrap.min.js"></script>
+      <!-- Scrolling Nav JavaScript -->
+      <script src="js/jquery.easing.min.js"></script>
+      <script src="js/scrolling-nav.js"></script>
+      <script src="js/cardpanel.js"></script>
+   </body>
 </html>
