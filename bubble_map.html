@@ -7,6 +7,19 @@
     <script src="https://d3js.org/topojson.v2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/density-clustering@1.3.0/lib/DBSCAN.min.js"></script>
     <style>
+        .container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .map-container {
+            flex-grow: 1;
+        }
+        .controls-container {
+            flex-basis: 200px; /* Adjust width as needed */
+            margin-left: 20px; /* Adjust margin as needed */
+        }
         .states {
             fill: #f6a071;
         }
@@ -24,26 +37,29 @@
             stroke: #fff;
             stroke-width: 1.5px;
         }
-        #controls {
-            margin-top: 20px;
-        }
     </style>
 </head>
 <body>
-    <svg width="960" height="600"></svg>
-    <div id="controls">
-        <label for="epsilon">Epsilon (max distance between points):</label>
-        <input type="number" id="epsilon" value="5">
-        <br>
-        <label for="minPts">MinPts (min number of points to form a cluster):</label>
-        <input type="number" id="minPts" value="5">
-        <br>
-        <label for="clustering">Enable Clustering:</label>
-        <input type="checkbox" id="clustering" checked>
+    <div class="container">
+        <div class="map-container">
+            <svg width="960" height="600"></svg>
+        </div>
+        <div class="controls-container">
+            <div id="controls">
+                <label for="epsilon">Epsilon (max distance between points):</label>
+                <input type="number" id="epsilon" value="5">
+                <br>
+                <label for="minPts">MinPts (min number of points to form a cluster):</label>
+                <input type="number" id="minPts" value="5">
+                <br>
+                <label for="clustering">Enable Clustering:</label>
+                <input type="checkbox" id="clustering" checked>
+            </div>
+            <svg id="cluster-size" width="200" height="30">
+                <text x="10" y="20">Cluster Size: </text>
+            </svg>
+        </div>
     </div>
-    <svg id="cluster-size" width="960" height="30">
-        <text x="10" y="20">Cluster Size: </text>
-    </svg>
     <script>
 
         var svg = d3.select("svg"),
